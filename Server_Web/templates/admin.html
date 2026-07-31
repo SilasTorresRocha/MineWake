@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - MineWake</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 { margin-top: 0; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cert-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .cert-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            background: #ef4444;
+            border-radius: 4px;
+            font-size: 12px;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        #dashboard { display: none; }
+    </style>
+</head>
+<body>
+    <div class="glass-panel">
+        
+        <div id="loginSection">
+            <h1>Login Admin</h1>
+            <input type="text" id="username" placeholder="Usuário">
+            <input type="password" id="password" placeholder="Senha">
+            <button class="btn" onclick="fazerLogin()">Entrar</button>
+        </div>
+
+        <div id="dashboard">
+            <h1>Gerenciar Certificados</h1>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="novoNome" placeholder="Nome do Usuário" style="margin-bottom:0">
+                <button class="btn" style="width:auto; padding: 0 20px;" onclick="criarCert()">Gerar</button>
+            </div>
+
+            <div class="cert-list" id="listaCerts"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Check se já tem cookie
+        if (document.cookie.includes("minewake_admin=autenticado")) {
+            showDashboard();
+        }
+
+        async function fazerLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            
+            const formData = new FormData();
+            formData.append('username', u);
+            formData.append('password', p);
+
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                body: formData
+            });
+
+            if(res.ok) {
+                showDashboard();
+            } else {
+                alert("Login incorreto");
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            carregarCerts();
+        }
+
+        async function carregarCerts() {
+            const res = await fetch('/api/admin/certificados');
+            if (res.status === 401) {
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
+                return;
+            }
+            const data = await res.json();
+            const div = document.getElementById('listaCerts');
+            div.innerHTML = '';
+            
+            data.forEach(c => {
+                const link = window.location.origin + '/?token=' + c.token;
+                div.innerHTML += `
+                    <div class="cert-item">
+                        <div>
+                            <strong>${c.nome}</strong><br>
+                            <small style="color:#94a3b8;">Criado em: ${c.criado_em}</small>
+                        </div>
+                        <button class="btn-sm" onclick="revogar('${c.token}')">Revogar</button>
+                    </div>
+                `;
+            });
+        }
+
+        async function criarCert() {
+            const nome = document.getElementById('novoNome').value;
+            if(!nome) return alert('Digite um nome');
+
+            const res = await fetch('/api/admin/certificados', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({nome})
+            });
+            
+            if(res.ok) {
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${nome}.p12`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                
+                alert("Certificado .p12 baixado! A senha para instalação é: minewake");
+            } else {
+                alert("Erro ao criar certificado.");
+            }
+            
+            document.getElementById('novoNome').value = '';
+            carregarCerts();
+        }
+
+        async function revogar(token) {
+            if(confirm("Tem certeza? O usuário perderá o acesso imediatamente.")) {
+                await fetch('/api/admin/certificados/' + token, { method: 'DELETE' });
+                carregarCerts();
+            }
+        }
+    </script>
+</body>
+</html>
