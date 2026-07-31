@@ -1,0 +1,11 @@
+serversilas.ddns.net { 
+    tls { 
+        client_auth { 
+            mode verify_if_given 
+            trusted_ca_cert_file /etc/caddy/ca/ca.crt 
+        } 
+    } 
+    reverse_proxy host.docker.internal:8000 { 
+        header_up X-Client-Cert-Subject {tls_client_subject} 
+    } 
+} 

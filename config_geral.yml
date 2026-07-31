@@ -1,0 +1,12 @@
+minecraft_mac: "00:a0:f0:c0:fc:42"
+ip_orange_pi: "192.168.0.106"
+porta_orange_pi: 8080
+ip_server_mine: "192.168.0.188"
+minecraft_nome_container: "mine-server"
+timeout_minutos: 10
+
+rcon:
+  porta: 25575
+  senha: "senha_segura_muito_boa"
+
+ca_name: "Silas"
