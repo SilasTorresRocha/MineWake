@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Negado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #ef4444;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            text-decoration: none;
+            border: 1px solid var(--glass-border);
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+    <div class="glass-panel">
+        <svg style="width:64px;height:64px;color:#ef4444;margin-bottom:20px" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16" />
+        </svg>
+        <h1>Acesso Negado</h1>
+        <p>Você não possui um certificado de acesso válido ou ele expirou. Solicite um novo link de acesso ao administrador.</p>
+        <a href="/admin" class="btn">Login Administrativo</a>
+    </div>
+</body>
+</html>

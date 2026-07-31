@@ -1,0 +1,12 @@
+services:
+  minewake-web:
+    build: .
+    container_name: minewake-web
+    network_mode: "host"
+    environment:
+      - ADMIN_USER=admin
+      - ADMIN_PASS=ALTERAR_SENHA_ADMIN
+    volumes:
+      - .:/app
+      - ../config_geral.yml:/app/config_geral.yml:ro
+    restart: unless-stopped

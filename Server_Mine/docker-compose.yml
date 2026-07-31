@@ -1,0 +1,15 @@
+services:
+  minecraft:
+    image: eclipse-temurin:21-jre
+    container_name: ${MINECRAFT_NOME_CONTAINER:-mine-server}
+    working_dir: /data
+    # Tenta rodar o script de inicio padrão ou deixa o container vivo caso não exista para debug
+    command: sh -c "if [ -f /data/startserver.sh ]; then sh /data/startserver.sh; else echo 'startserver.sh nao encontrado' && tail -f /dev/null; fi"
+    volumes:
+      - ./minecraft_data:/data
+    ports:
+      - "25565:25565" # Porta principal do Minecraft
+      - "127.0.0.1:25575:25575" # Porta do RCON restrita ao localhost
+    restart: unless-stopped
+    tty: true
+    stdin_open: true

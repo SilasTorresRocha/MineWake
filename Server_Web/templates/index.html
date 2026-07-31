@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineWake - Painel de Controle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --status-online: #10b981;
+            --status-offline: #ef4444;
+            --status-loading: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .background-blobs {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.5;
+            border-radius: 50%;
+            animation: float 10s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: rgba(59, 130, 246, 0.3); }
+        .blob-2 { bottom: -10%; right: -10%; width: 30vw; height: 30vw; background: rgba(16, 185, 129, 0.2); }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 40px) scale(1.1); }
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-weight: 800;
+            font-size: 2rem;
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .status-offline { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+        .status-online { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+        .status-loading { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+
+        .info-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+        }
+        .btn-primary:hover {
+            background: var(--accent-blue-hover);
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Loading animation */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="glass-panel">
+        <h1>MineWake</h1>
+        
+        <div id="statusBadge" class="status-badge status-offline">
+            Aguardando...
+        </div>
+
+        <div class="info-card">
+            <div class="info-item">
+                <span class="info-label">Jogadores</span>
+                <span class="info-value" id="jogadoresValue">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Timeout Em</span>
+                <span class="info-value" id="timeoutValue">-</span>
+            </div>
+        </div>
+
+        <button id="btnLigar" class="btn btn-primary" onclick="ligarServidor()">
+            <svg style="width:20px;height:20px;vertical-align:middle;margin-right:8px;" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,7V13L16.2,16.1L17,14.9L12.5,12.2V7H11Z" />
+            </svg>
+            Ligar Servidor
+        </button>
+        
+        <button id="btnRenovar" class="btn btn-secondary" onclick="renovarTempo()" style="display: none;">
+            Renovar Timeout
+        </button>
+
+        <div class="footer">
+            Atualizado em tempo real • <a href="/admin" style="color:var(--text-muted);text-decoration:none;">Admin</a>
+        </div>
+    </div>
+
+    <script>
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                if (res.status === 401) {
+                    window.location.href = '/erro';
+                    return;
+                }
+                const data = await res.json();
+                updateUI(data);
+            } catch (err) {
+                console.error("Erro ao buscar status:", err);
+            }
+        }
+
+        function updateUI(data) {
+            const badge = document.getElementById('statusBadge');
+            const btnLigar = document.getElementById('btnLigar');
+            const btnRenovar = document.getElementById('btnRenovar');
+            const jogValue = document.getElementById('jogadoresValue');
+            const timeValue = document.getElementById('timeoutValue');
+
+            // Update textos
+            jogValue.textContent = data.status === "Desligado" ? "-" : data.jogadores;
+            timeValue.textContent = data.tempo_restante_minutos ? data.tempo_restante_minutos + "m" : "-";
+
+            // Limpa classes
+            badge.className = "status-badge";
+            
+            if (data.status.toLowerCase() === "desligado") {
+                badge.classList.add("status-offline");
+                badge.textContent = "Desligado";
+                btnLigar.disabled = false;
+                btnLigar.innerHTML = 'Ligar Servidor';
+                btnRenovar.style.display = "none";
+            } 
+            else if (data.status.toLowerCase().includes("ligando")) {
+                badge.classList.add("status-loading");
+                badge.innerHTML = '<div class="spinner"></div> Iniciando...';
+                btnLigar.disabled = true;
+                btnLigar.innerHTML = 'Ligando...';
+                btnRenovar.style.display = "none";
+            } 
+            else if (data.status.toLowerCase() === "online") {
+                badge.classList.add("status-online");
+                badge.textContent = "Online";
+                btnLigar.disabled = true;
+                btnLigar.innerHTML = 'Servidor Online';
+                btnRenovar.style.display = "block";
+            }
+        }
+
+        async function ligarServidor() {
+            document.getElementById('btnLigar').disabled = true;
+            document.getElementById('btnLigar').innerHTML = '<div class="spinner"></div> Ligando...';
+            
+            try {
+                const res = await fetch('/api/ligar', { method: 'POST' });
+                if (!res.ok) throw new Error("Falha");
+                fetchStatus();
+            } catch (e) {
+                alert("Erro ao tentar ligar o servidor.");
+                document.getElementById('btnLigar').disabled = false;
+                document.getElementById('btnLigar').innerHTML = 'Ligar Servidor';
+            }
+        }
+
+        async function renovarTempo() {
+            try {
+                await fetch('/api/renovar', { method: 'POST' });
+                alert("Comando de renovação enviado! O timer será resetado na próxima checagem.");
+            } catch (e) {
+                alert("Erro ao renovar tempo.");
+            }
+        }
+
+        // Loop principal
+        fetchStatus();
+        setInterval(fetchStatus, 5000);
+    </script>
+</body>
+</html>
