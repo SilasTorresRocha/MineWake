@@ -133,9 +133,17 @@ def main():
                     notificar_web(ip_web, porta_web, jogadores, "online", timeout_max)
             else:
                 # Servidor ainda esta iniciando ou offline
-                print("Servidor inacessível via RCON no momento.")
-                notificar_web(ip_web, porta_web, 0, "ligando/indisponivel", timeout_max)
-                minutos_vazio = 0
+                minutos_vazio += 1
+                tempo_restante = timeout_max - minutos_vazio
+                print(f"Servidor inacessível via RCON. Timeout em {tempo_restante} minutos.")
+                notificar_web(ip_web, porta_web, 0, "indisponivel", tempo_restante)
+                
+                if minutos_vazio >= timeout_max:
+                    print("Timeout atingido por falha no RCON! Desligando...")
+                    notificar_web(ip_web, porta_web, 0, "desligando", 0)
+                    subprocess.run(["docker", "stop", container_name])
+                    subprocess.run(["shutdown", "-h", "now"])
+                    break
                 
         except Exception as e:
             print(f"Erro no loop principal: {e}")
