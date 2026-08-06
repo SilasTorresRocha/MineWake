@@ -25,7 +25,6 @@ $DOMAIN_PC {
         }
     }
     reverse_proxy host.docker.internal:$PORT_PC {
-        header_up -X-Client-Cert-Subject
         header_up X-Client-Cert-Subject {tls_client_subject}
     }
 }
