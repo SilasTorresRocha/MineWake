@@ -1,0 +1,18 @@
+# Segredos, certificados e banco local
+Server_Web/ca/
+*.key
+*.crt
+*.pem
+*.p12
+*.db
+https/Caddyfile
+.env
+
+# Python / Ambientes
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Dados do servidor Minecraft
+Server_Mine/minecraft_data/
